@@ -1,2 +1,2 @@
 include ':openCVLibrary300'
-include ':_5206_04'
+include ':FrintterApp'
