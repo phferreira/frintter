@@ -13,12 +13,12 @@ import android.view.View;
  * Created by paulo on 06/11/16.
  */
 
-public class PintarTela extends View {
+public class EditarFotoView extends View {
     private Paint paint = new Paint();
     private Path path = new Path();
 
     //Esta classe também herdará da classe “View” e utilizará dois objetos, do tipo “Paint” e “Path”.
-    public PintarTela(Context context, AttributeSet attrs) {
+    public EditarFotoView(Context context, AttributeSet attrs) {
         super(context, attrs);
         paint.setAntiAlias(true);
         paint.setStrokeWidth(6);
@@ -52,5 +52,5 @@ public class PintarTela extends View {
         invalidate();
         return true;
     }
-};
+}
 
