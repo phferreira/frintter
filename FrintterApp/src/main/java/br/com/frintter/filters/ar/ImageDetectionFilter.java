@@ -2,10 +2,6 @@ package br.com.frintter.filters.ar;
 
 import android.content.Context;
 
-import br.com.frintter.ui.LabActivity;
-import br.com.frintter.utils.PointsUtil;
-import br.com.frintter.filters.Filter;
-
 import org.opencv.android.Utils;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
@@ -28,6 +24,10 @@ import org.opencv.imgproc.Imgproc;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import br.com.frintter.filters.Filter;
+import br.com.frintter.ui.LabActivity;
+import br.com.frintter.utils.PointsUtil;
 
 public final class ImageDetectionFilter implements Filter {
 
@@ -100,14 +100,14 @@ public final class ImageDetectionFilter implements Filter {
 
         // Store the reference image's corner coordinates, in pixels.
         mReferenceCorners.put(0, 0,
-                new double[]{0.0, 0.0});
+                0.0, 0.0);
         mReferenceCorners.put(1, 0,
-                new double[]{referenceImageGray.cols(), 0.0});
+                referenceImageGray.cols(), 0.0);
         mReferenceCorners.put(2, 0,
-                new double[]{referenceImageGray.cols(),
-                        referenceImageGray.rows()});
+                referenceImageGray.cols(),
+                referenceImageGray.rows());
         mReferenceCorners.put(3, 0,
-                new double[]{0.0, referenceImageGray.rows()});
+                0.0, referenceImageGray.rows());
 
         // Detect the reference features and compute their
         // descriptors.
@@ -117,11 +117,11 @@ public final class ImageDetectionFilter implements Filter {
                 mReferenceKeypoints, mReferenceDescriptors);
     }
 
-    public double getMediaXY() {
+    private double getMediaXY() {
         return mediaXY;
     }
 
-    public void setMediaXY(double mediaXY) {
+    private void setMediaXY(double mediaXY) {
         this.mediaXY = mediaXY;
     }
 
@@ -190,9 +190,9 @@ public final class ImageDetectionFilter implements Filter {
 
         // Identify "good" keypoints based on match distance.
         final ArrayList<Point> goodReferencePointsList =
-                new ArrayList<Point>();
+                new ArrayList<>();
         final ArrayList<Point> goodScenePointsList =
-                new ArrayList<Point>();
+                new ArrayList<>();
         final double maxGoodMatchDist = 1.75 * minDist;
         for (final DMatch match : matchesList) {
             if (match.distance < maxGoodMatchDist) {
@@ -245,7 +245,7 @@ public final class ImageDetectionFilter implements Filter {
         }
     }
 
-    protected void draw(final Mat src, final Mat dst) {
+    private void draw(final Mat src, final Mat dst) {
 
         if (dst != src) {
             src.copyTo(dst);
@@ -292,15 +292,15 @@ public final class ImageDetectionFilter implements Filter {
                 new Point(mSceneCorners.get(3, 0)), mLineColor, 4);
         Imgproc.line(dst, new Point(mSceneCorners.get(3, 0)),
                 new Point(mSceneCorners.get(0, 0)), mLineColor, 4);
-        List<Point> points = new ArrayList();
+        ArrayList<Point> points = new ArrayList<>();
         points.add(new Point(mSceneCorners.get(0, 0)));
         points.add(new Point(mSceneCorners.get(1, 0)));
         points.add(new Point(mSceneCorners.get(2, 0)));
         points.add(new Point(mSceneCorners.get(3, 0)));
 
         if (PointsUtil.isSquare(points)) {
-            dX = distance(new Point(mSceneCorners.get(0, 0)), new Point(mSceneCorners.get(1, 0))) / 15;
-            dY = distance(new Point(mSceneCorners.get(1, 0)), new Point(mSceneCorners.get(2, 0))) / 15;
+            dX = distance(new Point(mSceneCorners.get(0, 0)), new Point(mSceneCorners.get(1, 0))) / 7.25;
+            dY = distance(new Point(mSceneCorners.get(1, 0)), new Point(mSceneCorners.get(2, 0))) / 7.25;
 
             setMediaXY((dX + dY) / 2);
             LabActivity.EXTRA_PHOTO_MAT = getMediaXY();
@@ -309,19 +309,32 @@ public final class ImageDetectionFilter implements Filter {
             int length2 = (int) ((double) dst.cols() / dX);
 
             Point start = new Point(0.0, 0.0);
-            start = new
+            Point startY = new Point(0.0, 0.0);
 
-                    Point(0.0, 0.0);
-
-            for (
-                    int i = 0;
-                    i <= length1; i++)
-
-            {
-                Imgproc.line(dst, start, new Point(start.x, start.y + dY), new Scalar(255, 0, 0), 10);
+            // Desenha regua lateral do eixo X
+            for (int i = 0; i <= length1; i++) {
+                if (i == 1) {
+                    for (int j = 0; j <= length2; j++) {
+//                        Imgproc.line(dst, startY, new Point(startY.x + dX, startY.y), new Scalar(255, 0, 0), 4);
+                        startY = new Point(startY.x + dX, (start.y - (start.y / 3)));
+//                        Imgproc.line(dst, new Point(startY.x, 0), new Point(startY.x, 5), new Scalar(255, 0, 0), 4);
+                        Imgproc.putText(dst, "" + (j + 1), startY, 1, 2, new Scalar(255, 0, 0), 2);
+                    }
+                }
+                Imgproc.line(dst, start, new Point(start.x, start.y + dY), new Scalar(255, 0, 0), 4);
                 start = new Point(start.x, start.y + dY);
-                Imgproc.line(dst, new Point(0, start.y), new Point(10, start.y), new Scalar(255, 0, 0), 10);
-                Imgproc.putText(dst, "    " + (i + 1) + " cm", start, 1, 4, new Scalar(255, 0, 0), 10);
+                Imgproc.line(dst, new Point(0, start.y), new Point(30, start.y), new Scalar(255, 0, 0), 1);
+                Imgproc.putText(dst, " " + (i + 1), start, 1, 2, new Scalar(255, 0, 0), 2);
+            }
+
+            start = new Point(0.0, 0.0);
+
+            // Desenha regua lateral do eixo Y
+            for (int i = 0; i <= length2; i++) {
+                Imgproc.line(dst, start, new Point(start.x + dX, start.y), new Scalar(255, 0, 0), 4);
+                start = new Point(start.x + dX, start.y);
+                Imgproc.line(dst, new Point(start.x, 0), new Point(start.x, 30), new Scalar(255, 0, 0), 1);
+//                Imgproc.putText(dst, " " + (i + 1) , start, 1, 2, new Scalar(255, 0, 0), 2, 10, true);
             }
         }
     }
@@ -329,11 +342,10 @@ public final class ImageDetectionFilter implements Filter {
 
 
     //euclidean distance (?)
-    public double distance(Point p, Point q) {
+    private double distance(Point p, Point q) {
         double deltaX = p.y - q.y;
         double deltaY = p.x - q.x;
-        double result = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        return result;
+        return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     }
 
     private boolean isRectangle(Point p1, Point p2, Point p3, Point p4) {
@@ -342,10 +354,7 @@ public final class ImageDetectionFilter implements Filter {
         m2 = (p2.y - p3.y) / (p2.x - p3.x);
         m3 = (p4.y - p3.y) / (p4.x - p3.x);
 
-        if ((m1 * m2) == -1 && (m2 * m3) == -1)
-            return true;
-        else
-            return false;
+        return (m1 * m2) == -1 && (m2 * m3) == -1;
     }
 
 

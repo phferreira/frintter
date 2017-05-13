@@ -1,21 +1,11 @@
-<menu xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_delete"
-        app:showAsAction="ifRoom|withText"
-        android:title="@string/delete" />
+        android:title="@string/delete"
+        app:showAsAction="ifRoom|withText" />
     <item
         android:id="@+id/menu_edit"
-        app:showAsAction="ifRoom|withText"
-        android:title="@string/edit" />
-    <item
-        android:id="@+id/menu_share"
-        app:showAsAction="ifRoom|withText"
-        android:title="@string/share"
-        android:checked="false"
-        android:enabled="false"
-        android:checkable="false"
-        android:visible="false" />
-
+        android:title="@string/edit"
+        app:showAsAction="ifRoom|withText" />
 </menu>

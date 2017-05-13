@@ -8,7 +8,6 @@ import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -21,19 +20,6 @@ import android.view.SubMenu;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
-
-import br.com.frintter.R;
-import br.com.frintter.filters.Filter;
-import br.com.frintter.filters.NoneFilter;
-import br.com.frintter.filters.ar.ImageDetectionFilter;
-import br.com.frintter.filters.convolution.StrokeEdgesFilter;
-import br.com.frintter.filters.curve.CrossProcessCurveFilter;
-import br.com.frintter.filters.curve.PortraCurveFilter;
-import br.com.frintter.filters.curve.ProviaCurveFilter;
-import br.com.frintter.filters.curve.VelviaCurveFilter;
-import br.com.frintter.filters.mixer.RecolorCMVFilter;
-import br.com.frintter.filters.mixer.RecolorRCFilter;
-import br.com.frintter.filters.mixer.RecolorRGVFilter;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -50,6 +36,19 @@ import org.opencv.imgproc.Imgproc;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import br.com.frintter.R;
+import br.com.frintter.filters.Filter;
+import br.com.frintter.filters.NoneFilter;
+import br.com.frintter.filters.ar.ImageDetectionFilter;
+import br.com.frintter.filters.convolution.StrokeEdgesFilter;
+import br.com.frintter.filters.curve.CrossProcessCurveFilter;
+import br.com.frintter.filters.curve.PortraCurveFilter;
+import br.com.frintter.filters.curve.ProviaCurveFilter;
+import br.com.frintter.filters.curve.VelviaCurveFilter;
+import br.com.frintter.filters.mixer.RecolorCMVFilter;
+import br.com.frintter.filters.mixer.RecolorRCFilter;
+import br.com.frintter.filters.mixer.RecolorRGVFilter;
 
 // Use the deprecated Camera class.
 @SuppressWarnings("deprecation")
@@ -80,7 +79,7 @@ public final class CameraActivity extends ActionBarActivity
     // An ID for items in the image size submenu.
     private static final int MENU_GROUP_ID_SIZE = 2;
 
-    public Filter akbarHunting;
+    public Filter marcador;
 
     // The filters.
     private Filter[] mImageDetectionFilters;
@@ -135,34 +134,22 @@ public final class CameraActivity extends ActionBarActivity
                             //mCameraView.enableFpsMeter();
                             mBgr = new Mat();
 
-                            final Filter starryNight;
                             try {
-                                starryNight = new ImageDetectionFilter(
+                                marcador = new ImageDetectionFilter(
                                         CameraActivity.this,
-                                        R.drawable.dino_preto);
-                            } catch (IOException e) {
-                                Log.e(TAG, "Failed to load drawable: " +
-                                        "starry_night");
-                                e.printStackTrace();
-                                break;
-                            }
-
-                            try {
-                                akbarHunting = new ImageDetectionFilter(
-                                        CameraActivity.this,
-                                        R.drawable.akbar_hunting_with_cheetahs);
+                                        R.drawable.marcador);
 
                             } catch (IOException e) {
                                 Log.e(TAG, "Failed to load drawable: " +
-                                        "akbar_hunting_with_cheetahs");
+                                        "marcador");
                                 e.printStackTrace();
                                 break;
                             }
 
                             mImageDetectionFilters = new Filter[]{
                                     new NoneFilter(),
-                                    starryNight,
-                                    akbarHunting
+                                    new NoneFilter(),
+                                    marcador
                             };
 
                             mCurveFilters = new Filter[]{
@@ -224,21 +211,13 @@ public final class CameraActivity extends ActionBarActivity
         }
 
         final Camera camera;
-        if (Build.VERSION.SDK_INT >=
-                Build.VERSION_CODES.GINGERBREAD) {
-            CameraInfo cameraInfo = new CameraInfo();
-            Camera.getCameraInfo(mCameraIndex, cameraInfo);
-            mIsCameraFrontFacing =
-                    (cameraInfo.facing ==
-                            CameraInfo.CAMERA_FACING_FRONT);
-            mNumCameras = Camera.getNumberOfCameras();
-            camera = Camera.open(mCameraIndex);
-        } else { // pre-Gingerbread
-            // Assume there is only 1 camera and it is rear-facing.
-            mIsCameraFrontFacing = false;
-            mNumCameras = 1;
-            camera = Camera.open();
-        }
+        CameraInfo cameraInfo = new CameraInfo();
+        Camera.getCameraInfo(mCameraIndex, cameraInfo);
+        mIsCameraFrontFacing =
+                (cameraInfo.facing ==
+                        CameraInfo.CAMERA_FACING_FRONT);
+        mNumCameras = Camera.getNumberOfCameras();
+        camera = Camera.open(mCameraIndex);
         final Parameters parameters = camera.getParameters();
         camera.release();
         mSupportedImageSizes =
@@ -278,13 +257,7 @@ public final class CameraActivity extends ActionBarActivity
     @SuppressLint("NewApi")
     @Override
     public void recreate() {
-        if (Build.VERSION.SDK_INT >=
-                Build.VERSION_CODES.HONEYCOMB) {
-            super.recreate();
-        } else {
-            finish();
-            startActivity(getIntent());
-        }
+        super.recreate();
     }
 
     @Override
@@ -314,17 +287,7 @@ public final class CameraActivity extends ActionBarActivity
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.activity_camera, menu);
-        if (mNumCameras < 2) {
-            // Remove the option to switch cameras, since there is
-            // only 1.
-            menu.removeItem(R.id.menu_next_camera);
-        }
-        menu.removeItem(R.id.menu_next_convolution_filter);
-        menu.removeItem(R.id.menu_next_curve_filter);
-        menu.removeItem(R.id.menu_next_image_detection_filter);
-        menu.removeItem(R.id.menu_next_mixer_filter);
-        menu.removeItem(R.id.menu_share);
-        menu.removeItem(R.id.menu_next_camera);
+
         int numSupportedImageSizes = mSupportedImageSizes.size();
         if (numSupportedImageSizes > 1) {
             final SubMenu sizeSubMenu = menu.addSubMenu(
@@ -354,43 +317,14 @@ public final class CameraActivity extends ActionBarActivity
             return true;
         }
         switch (item.getItemId()) {
-            case R.id.menu_next_image_detection_filter:
-                mImageDetectionFilterIndex++;
-                if (mImageDetectionFilterIndex ==
-                        mImageDetectionFilters.length) {
-                    mImageDetectionFilterIndex = 0;
-                }
-                return true;
-            case R.id.menu_next_curve_filter:
-                mCurveFilterIndex++;
-                if (mCurveFilterIndex == mCurveFilters.length) {
-                    mCurveFilterIndex = 0;
-                }
-                return true;
-            case R.id.menu_next_mixer_filter:
-                mMixerFilterIndex++;
-                if (mMixerFilterIndex == mMixerFilters.length) {
-                    mMixerFilterIndex = 0;
-                }
-                return true;
-            case R.id.menu_next_convolution_filter:
-                mConvolutionFilterIndex++;
-                if (mConvolutionFilterIndex ==
-                        mConvolutionFilters.length) {
-                    mConvolutionFilterIndex = 0;
-                }
-                return true;
-            case R.id.menu_next_camera:
-                mIsMenuLocked = true;
+//            case R.id.menu_next_image_detection_filter:
+//                mImageDetectionFilterIndex++;
+//                if (mImageDetectionFilterIndex ==
+//                        mImageDetectionFilters.length) {
+//                    mImageDetectionFilterIndex = 0;
+//                }
+//                return true;
 
-                // With another camera index, recreate the activity.
-                mCameraIndex++;
-                if (mCameraIndex == mNumCameras) {
-                    mCameraIndex = 0;
-                }
-                recreate();
-
-                return true;
             case R.id.menu_take_photo:
                 mIsMenuLocked = true;
 
@@ -506,7 +440,7 @@ public final class CameraActivity extends ActionBarActivity
         intent.putExtra(LabActivity.EXTRA_PHOTO_URI, uri);
         intent.putExtra(LabActivity.EXTRA_PHOTO_DATA_PATH, photoPath);
 
-//        intent.putExtra(LabActivity.EXTRA_PHOTO_MAT, akbarHunting. );
+//        intent.putExtra(LabActivity.EXTRA_PHOTO_MAT, marcador. );
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

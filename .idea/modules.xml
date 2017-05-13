@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Frintter.iml" filepath="$PROJECT_DIR$/Frintter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FrintterApp/FrintterApp.iml" filepath="$PROJECT_DIR$/FrintterApp/FrintterApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/openCVLibrary300/openCVLibrary300.iml" filepath="$PROJECT_DIR$/openCVLibrary300/openCVLibrary300.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 25
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "br.com.frintter"
         minSdkVersion 15
-        targetSdkVersion 24
+        targetSdkVersion 25
     }
 
     buildTypes {
@@ -21,6 +21,6 @@ android {
 dependencies {
     compile project(':openCVLibrary300')
     compile files('libs/commons-math3-3.5.jar')
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.android.support:design:24.2.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
 }
