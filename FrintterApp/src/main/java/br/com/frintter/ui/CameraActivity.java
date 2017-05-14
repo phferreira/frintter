@@ -16,7 +16,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -287,18 +286,6 @@ public final class CameraActivity extends ActionBarActivity
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.activity_camera, menu);
-
-        int numSupportedImageSizes = mSupportedImageSizes.size();
-        if (numSupportedImageSizes > 1) {
-            final SubMenu sizeSubMenu = menu.addSubMenu(
-                    R.string.menu_image_size);
-            for (int i = 0; i < numSupportedImageSizes; i++) {
-                final Size size = mSupportedImageSizes.get(i);
-                sizeSubMenu.add(MENU_GROUP_ID_SIZE, i, Menu.NONE,
-                        String.format("%dx%d", size.width,
-                                size.height));
-            }
-        }
         return true;
     }
 

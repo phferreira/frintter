@@ -94,6 +94,7 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 25 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="android-gif-drawable-1.1.17" level="project" />
     <orderEntry type="library" exported="" name="commons-math3-3.5" level="project" />
     <orderEntry type="library" exported="" name="transition-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="design-25.3.1" level="project" />

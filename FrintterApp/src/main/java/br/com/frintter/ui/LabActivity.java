@@ -3,6 +3,7 @@ package br.com.frintter.ui;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -27,6 +29,7 @@ import org.opencv.imgproc.Imgproc;
 import java.text.DecimalFormat;
 
 import br.com.frintter.R;
+import br.com.frintter.utils.Coordenadas;
 
 import static org.opencv.imgcodecs.Imgcodecs.CV_LOAD_IMAGE_COLOR;
 import static org.opencv.imgcodecs.Imgcodecs.imread;
@@ -42,8 +45,10 @@ public final class LabActivity extends AppCompatActivity {
             "com.nummist.secondsight.LabActivity.extra.PHOTO_DATA_PATH";
     private static final String TAG = CameraActivity.class.getSimpleName();
     private static final Integer MAX_LINHAS = 10;
-    private static final Integer correcaoX = 0; //150;
-    private static final Integer correcaoY = 0;//50;
+    private static final Integer PONTO_INICIAL = 0;
+    private static final Integer PONTO_FINAL = 1;
+
+
     public static double EXTRA_PHOTO_MAT;
     private static Scalar[] corLinha = {
             new Scalar(255, 255, 0),   // Amarelo
@@ -57,13 +62,15 @@ public final class LabActivity extends AppCompatActivity {
             new Scalar(217, 217, 25),  // Bright Ouro
             new Scalar(77, 77, 255)    // Azul Neon
     };
+    private static Coordenadas coordenadas;
+    private static int pontoInicialFinal = 0;
     public Mat imagem;
-    float initialX, initialY;
+    public Mat[] imagemClone = new Mat[MAX_LINHAS];
     private Uri mUri;
     private String mDataPath;
     private Integer numLinhas = 0;
+    private Integer linhaAnterior = -1;
     private ImageView imageView;
-
     private BaseLoaderCallback mLoaderCallback =
             new BaseLoaderCallback(this) {
                 @Override
@@ -92,41 +99,71 @@ public final class LabActivity extends AppCompatActivity {
                 int action = event.getActionMasked();
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
-                        initialX = event.getX();
-                        initialY = event.getY();
-
                         if (numLinhas < MAX_LINHAS) {
-                            Imgproc.circle(imagem, new Point(initialX, initialY), 8, corLinha[numLinhas], 3);
-                            Imgcodecs.imwrite(mDataPath, imagem);
-                            pintarTela();
+                            coordenadas.setCoordenada(new Point(event.getX(), event.getY()), numLinhas);
                         }
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        float finalX = event.getX() - correcaoX;
-                        float finalY = event.getY() - correcaoY;
-
-                        double d = distance(new Point(initialX, initialY), new Point(finalX, finalY)) / EXTRA_PHOTO_MAT;
-
                         if (numLinhas < MAX_LINHAS) {
-                            Imgproc.line(imagem, new Point(initialX, initialY), new Point(finalX, finalY), corLinha[numLinhas], 4);
-                            Imgproc.putText(imagem, " " + (converterDoubleDoisDecimais(d)) + " cm", new Point(finalX, finalY), 1, 3, corLinha[numLinhas], 4);
-                            Imgproc.circle(imagem, new Point(finalX, finalY), 8, corLinha[numLinhas], 3);
-                            Imgcodecs.imwrite(mDataPath, imagem);
-                            pintarTela();
-                        }
+                            int tamanhoCirculo = 8;
+                            int espessuraCirculo = 3;
+                            int espessuraLinha = 4;
 
-                        numLinhas += 1;
+                            if (pontoInicialFinal == 0) {
+                                // Desenha circulo no ponto inicial
+                                Imgproc.circle(imagemClone[numLinhas], coordenadas.getCoordenada(numLinhas), tamanhoCirculo,
+                                        corLinha[numLinhas], espessuraCirculo);
+                                pontoInicialFinal = 1;
+                            } else {
+                                // Calcula distncia
+                                double d = distance(coordenadas.getCoordenada(numLinhas - pontoInicialFinal),
+                                        coordenadas.getCoordenada(numLinhas)) / EXTRA_PHOTO_MAT;
+                                // Desenha linha entre ponto inicial e final
+                                Imgproc.line(imagemClone[numLinhas], coordenadas.getCoordenada(numLinhas - pontoInicialFinal),
+                                        coordenadas.getCoordenada(numLinhas), corLinha[numLinhas - pontoInicialFinal], espessuraLinha);
+                                // Escreve a distancia calculada
+                                Imgproc.putText(imagemClone[numLinhas], " " + (converterDoubleDoisDecimais(d)),
+                                        coordenadas.getCoordenada(numLinhas), 1, 3, corLinha[numLinhas - pontoInicialFinal], espessuraLinha);
+                                // Desenha circulo no ponto final
+                                Imgproc.circle(imagemClone[numLinhas], coordenadas.getCoordenada(numLinhas), tamanhoCirculo,
+                                        corLinha[numLinhas - pontoInicialFinal], espessuraCirculo);
+                                // Quando clicado e a flag for final(1) seta para inicial(0)
+                                pontoInicialFinal = 0;
+                            }
+//                            Imgcodecs.imwrite(mDataPath, imagemClone[numLinhas]);
+                            pintarTela();
+                            IncrementarNumerador();
+                        }
                         break;
                 }
                 return true;
             }
         });
 
-        imageView.setImageURI(mUri);
+//        imageView.setImageURI(mUri);
+
+        for (int i = numLinhas + 1; i < MAX_LINHAS; i++) {
+            imagemClone[i] = imagemClone[numLinhas].clone();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(imagem.cols(), imagem.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(imagemClone[numLinhas], bitmap);
+        imageView.setImageBitmap(bitmap);
         imageView.setAdjustViewBounds(true);
         imageView.setScaleType(ImageView.ScaleType.FIT_XY);
         setContentView(imageView);
+    }
+
+    private void IncrementarNumerador() {
+        // Incrementa numero de linhas
+        numLinhas++;
+        linhaAnterior++;
+        // Incluido para realizar o metodo desfazer
+        if (numLinhas >= MAX_LINHAS) {
+            numLinhas = MAX_LINHAS;
+            linhaAnterior = MAX_LINHAS - 1;
+        }
     }
 
     @Override
@@ -136,11 +173,16 @@ public final class LabActivity extends AppCompatActivity {
         final Intent intent = getIntent();
         mUri = intent.getParcelableExtra(EXTRA_PHOTO_URI);
         mDataPath = intent.getStringExtra(EXTRA_PHOTO_DATA_PATH);
+        coordenadas = new Coordenadas();
 
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0,
                 this, mLoaderCallback);
 
         imagem = imread(mDataPath, CV_LOAD_IMAGE_COLOR);
+
+        for (int i = 0; i < MAX_LINHAS; i++) {
+            imagemClone[i] = imagem.clone();
+        }
 
         if (imagem.empty()){
             Log.d(TAG, "Image cannot found.");
@@ -158,22 +200,61 @@ public final class LabActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.menu_delete:
-            deletePhoto();
-            return true;
-        case R.id.menu_edit:
-            editPhoto();
-            return true;
-        default:
+            case R.id.menu_desfazer:
+                desfazerPhoto();
+                return true;
+            case R.id.menu_salvar:
+                salvarPhoto();
+                return true;
+            case R.id.menu_delete:
+                deletePhoto();
+                return true;
+            case R.id.menu_edit:
+                editPhoto();
+                return true;
+            default:
             return super.onOptionsItemSelected(item);
         }
     }
 
-    public double distance(Point p, Point q) {
-        double deltaX = p.y - q.y;
-        double deltaY = p.x - q.x;
+    private void desfazerPhoto() {
+        int auxNumLinhas = numLinhas;
+
+        if (numLinhas > 0) {
+            if (pontoInicialFinal == 1) {
+                pontoInicialFinal = 0;
+            } else {
+                pontoInicialFinal = 1;
+            }
+        }
+        if (linhaAnterior > 0) {
+            linhaAnterior--;
+            numLinhas = linhaAnterior;
+        } else {
+            linhaAnterior = -1;
+            numLinhas = 0;
+            for (int i = 0; i < MAX_LINHAS; i++) {
+                imagemClone[i] = imagem.clone();
+            }
+        }
+        pintarTela();
+
+        numLinhas = --auxNumLinhas;
+        if (numLinhas < 0) {
+            numLinhas = 0;
+        }
+    }
+
+    private void salvarPhoto() {
+        Imgcodecs.imwrite(mDataPath, imagemClone[numLinhas]);
+    }
+
+    public double distance(Point pontoInicial, Point pontoFinal) {
+        double deltaX = pontoInicial.y - pontoFinal.y;
+        double deltaY = pontoInicial.x - pontoFinal.x;
         return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     }
+
 
     private void deletePhoto() {
         final AlertDialog.Builder alert = new AlertDialog.Builder(

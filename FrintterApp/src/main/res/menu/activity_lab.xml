@@ -1,6 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/menu_desfazer"
+        android:title="@string/desfazer"
+        app:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/menu_salvar"
+        android:title="@string/salvar"
+        app:showAsAction="ifRoom|withText" />
+    <item
         android:id="@+id/menu_delete"
         android:title="@string/delete"
         app:showAsAction="ifRoom|withText" />

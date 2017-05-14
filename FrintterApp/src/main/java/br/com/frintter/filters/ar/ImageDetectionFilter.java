@@ -314,28 +314,28 @@ public final class ImageDetectionFilter implements Filter {
             // Desenha regua lateral do eixo X
             for (int i = 0; i <= length1; i++) {
                 if (i == 1) {
+                    // Escreve numeração da regua lateral X
                     for (int j = 0; j <= length2; j++) {
-//                        Imgproc.line(dst, startY, new Point(startY.x + dX, startY.y), new Scalar(255, 0, 0), 4);
-                        startY = new Point(startY.x + dX, (start.y - (start.y / 3)));
-//                        Imgproc.line(dst, new Point(startY.x, 0), new Point(startY.x, 5), new Scalar(255, 0, 0), 4);
+                        startY = new Point(startY.x + dX, 30);
                         Imgproc.putText(dst, "" + (j + 1), startY, 1, 2, new Scalar(255, 0, 0), 2);
                     }
                 }
                 Imgproc.line(dst, start, new Point(start.x, start.y + dY), new Scalar(255, 0, 0), 4);
-                start = new Point(start.x, start.y + dY);
+                start = new Point(start.x, (start.y + dY));
                 Imgproc.line(dst, new Point(0, start.y), new Point(30, start.y), new Scalar(255, 0, 0), 1);
                 Imgproc.putText(dst, " " + (i + 1), start, 1, 2, new Scalar(255, 0, 0), 2);
             }
 
             start = new Point(0.0, 0.0);
 
-            // Desenha regua lateral do eixo Y
+            // Desenha regua lateral do eixo Y sem numeros
             for (int i = 0; i <= length2; i++) {
                 Imgproc.line(dst, start, new Point(start.x + dX, start.y), new Scalar(255, 0, 0), 4);
                 start = new Point(start.x + dX, start.y);
                 Imgproc.line(dst, new Point(start.x, 0), new Point(start.x, 30), new Scalar(255, 0, 0), 1);
-//                Imgproc.putText(dst, " " + (i + 1) , start, 1, 2, new Scalar(255, 0, 0), 2, 10, true);
             }
+            Imgproc.putText(dst, "cm",
+                    new Point(50, 100), 1, 3, new Scalar(255, 0, 0), 3);
         }
     }
 //Imgproc.putText(dst,  distance1 + ":" + distance2, new Point(10, 10), 1, 1.0, new Scalar(255, 255, 255, 0));

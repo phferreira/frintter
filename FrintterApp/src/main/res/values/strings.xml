@@ -3,6 +3,8 @@
     <string name="app_name">Frintter</string>
     <string name="delete">Deletar</string>
     <string name="edit">Editar</string>
+    <string name="desfazer">Desfazer</string>
+    <string name="salvar">Salvar</string>
     <string name="menu_next_camera">Next Cam</string>
     <string name="menu_next_convolution_filter">Next Kernel</string>
     <string name="menu_next_curve_filter">Next Curve</string>
@@ -18,4 +20,8 @@
     <string name="photo_send_extra_subject">Foto de Frintter</string>
     <string name="photo_send_extra_text">Check out my photo from the Frintter app! http://nummist.com/opencv/</string>
     <string name="share">Share</string>
+
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>
