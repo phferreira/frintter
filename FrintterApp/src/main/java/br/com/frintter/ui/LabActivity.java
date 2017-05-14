@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -147,11 +148,12 @@ public final class LabActivity extends AppCompatActivity {
             imagemClone[i] = imagemClone[numLinhas].clone();
         }
 
-        Bitmap bitmap = Bitmap.createBitmap(imagem.cols(), imagem.rows(), Bitmap.Config.ARGB_8888);
+        final Bitmap bitmap = Bitmap.createBitmap(imagem.cols(), imagem.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(imagemClone[numLinhas], bitmap);
         imageView.setImageBitmap(bitmap);
         imageView.setAdjustViewBounds(true);
         imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        imageView.setBackgroundColor(Color.TRANSPARENT);
         setContentView(imageView);
     }
 
@@ -182,6 +184,7 @@ public final class LabActivity extends AppCompatActivity {
 
         for (int i = 0; i < MAX_LINHAS; i++) {
             imagemClone[i] = imagem.clone();
+            Imgproc.cvtColor(imagemClone[i], imagemClone[i], Imgproc.COLOR_RGBA2BGR, 4);
         }
 
         if (imagem.empty()){
@@ -235,6 +238,7 @@ public final class LabActivity extends AppCompatActivity {
             numLinhas = 0;
             for (int i = 0; i < MAX_LINHAS; i++) {
                 imagemClone[i] = imagem.clone();
+                Imgproc.cvtColor(imagemClone[i], imagemClone[i], Imgproc.COLOR_RGBA2BGR, 4);
             }
         }
         pintarTela();
