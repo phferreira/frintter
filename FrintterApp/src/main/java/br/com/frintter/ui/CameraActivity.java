@@ -221,7 +221,7 @@ public final class CameraActivity extends ActionBarActivity
         camera.release();
         mSupportedImageSizes =
                 parameters.getSupportedPreviewSizes();
-        final Size size = mSupportedImageSizes.get(0);
+        final Size size = mSupportedImageSizes.get(mSupportedImageSizes.size() - 1);
 
         mCameraView = new JavaCameraView(this, mCameraIndex);
         mCameraView.setMaxFrameSize(size.width, size.height);

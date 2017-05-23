@@ -299,8 +299,8 @@ public final class ImageDetectionFilter implements Filter {
         points.add(new Point(mSceneCorners.get(3, 0)));
 
         if (PointsUtil.isSquare(points)) {
-            dX = distance(new Point(mSceneCorners.get(0, 0)), new Point(mSceneCorners.get(1, 0))) / 7.25;
-            dY = distance(new Point(mSceneCorners.get(1, 0)), new Point(mSceneCorners.get(2, 0))) / 7.25;
+            dX = distance(new Point(mSceneCorners.get(0, 0)), new Point(mSceneCorners.get(1, 0))) / 14.5;
+            dY = distance(new Point(mSceneCorners.get(1, 0)), new Point(mSceneCorners.get(2, 0))) / 14.5;
 
             setMediaXY((dX + dY) / 2);
             LabActivity.EXTRA_PHOTO_MAT = getMediaXY();

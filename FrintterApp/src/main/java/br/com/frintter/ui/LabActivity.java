@@ -10,12 +10,16 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
@@ -36,10 +40,10 @@ import static org.opencv.imgcodecs.Imgcodecs.CV_LOAD_IMAGE_COLOR;
 import static org.opencv.imgcodecs.Imgcodecs.imread;
 
 public final class LabActivity extends AppCompatActivity {
-    
+
     public static final String PHOTO_FILE_EXTENSION = ".png";
     public static final String PHOTO_MIME_TYPE = "image/png";
-    
+
     public static final String EXTRA_PHOTO_URI =
             "com.nummist.secondsight.LabActivity.extra.PHOTO_URI";
     public static final String EXTRA_PHOTO_DATA_PATH =
@@ -48,7 +52,6 @@ public final class LabActivity extends AppCompatActivity {
     private static final Integer MAX_LINHAS = 10;
     private static final Integer PONTO_INICIAL = 0;
     private static final Integer PONTO_FINAL = 1;
-
 
     public static double EXTRA_PHOTO_MAT;
     private static Scalar[] corLinha = {
@@ -90,8 +93,8 @@ public final class LabActivity extends AppCompatActivity {
         String string2 = part[0] + "." + part[1];
         return Double.parseDouble(string2);
     }
-    
-    public void pintarTela(){
+
+    public void pintarTela() {
         imageView = new ImageView(this);
 
         imageView.setOnTouchListener(new View.OnTouchListener() {
@@ -151,9 +154,9 @@ public final class LabActivity extends AppCompatActivity {
         final Bitmap bitmap = Bitmap.createBitmap(imagem.cols(), imagem.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(imagemClone[numLinhas], bitmap);
         imageView.setImageBitmap(bitmap);
-        imageView.setAdjustViewBounds(true);
-        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-        imageView.setBackgroundColor(Color.TRANSPARENT);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(imagem.width(), imagem.height());
+        lp.gravity = Gravity.CENTER_HORIZONTAL;
+        imageView.setLayoutParams(lp);
         setContentView(imageView);
     }
 
@@ -187,9 +190,9 @@ public final class LabActivity extends AppCompatActivity {
             Imgproc.cvtColor(imagemClone[i], imagemClone[i], Imgproc.COLOR_RGBA2BGR, 4);
         }
 
-        if (imagem.empty()){
+        if (imagem.empty()) {
             Log.d(TAG, "Image cannot found.");
-        }else{
+        } else {
             pintarTela();
         }
     }
@@ -216,7 +219,7 @@ public final class LabActivity extends AppCompatActivity {
                 editPhoto();
                 return true;
             default:
-            return super.onOptionsItemSelected(item);
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -270,18 +273,18 @@ public final class LabActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface dialog,
-                            final int which) {
+                                        final int which) {
                         getContentResolver().delete(
                                 Images.Media.EXTERNAL_CONTENT_URI,
                                 MediaStore.MediaColumns.DATA + "=?",
-                                new String[] { mDataPath });
+                                new String[]{mDataPath});
                         finish();
                     }
                 });
         alert.setNegativeButton(android.R.string.cancel, null);
         alert.show();
     }
-    
+
     /*
      * Show a chooser so that the user may pick an app for editing
      * the photo.
